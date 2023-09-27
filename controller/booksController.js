@@ -8,8 +8,35 @@ const Book        = require('../models/book.js');
 //SECTION - Routes
 //static Routes
     //Purpose: Index of all Books
-books.get("/", (request, response)=>
+books.get('/', (request, response) => {
+    Book.find()
+        .then(foundBooks => 
+        {
+            response.status(200).json(foundBooks)
+        })
+        .catch(err => 
+        {
+            response.status(400).json(
+            {
+                message: 'Failed to load the index of all books'
+            })
+        })
+});
+    //Purpose: add a singular Book
+books.post("/", (request,response) => 
 {
+    Book.create(request.body)
+    .then(createdBook => 
+    {
+        response.status(200).json(createdBook)
+    })
+    .catch(err => 
+    {
+        response.status(400).json(
+        {
+            message: 'Failed to create a new book'
+        })
+    })
 
 });
     //Purpose: Seed in Data for faster testing
@@ -43,33 +70,65 @@ books.get('/seed', (request, response) =>
         "quantity": 4,
         "imageURL": "https://imgur.com/qYLKtPH.jpeg"
         }])
-        .then(res.status(200).json({
+        .then(response.status(200).json({
             message: 'Seed successful'
         }))
-        .catch(res.status(400).json({
+        .catch(response.status(400).json({
             message: 'Seed unsuccessful'
         }));
 });
+
     
 //Dynamic Routes
     //Purpose: List the Info for an Individual Book
 books.get("/:id", (request, response)=>
 {
+    Book.findById(request.params.id)
+    .then(foundBook => 
+    {
+        response.status(200).json(foundBook)
+    })
+    .catch(err => 
+    {
+        response.status(400).json(
+        {
+            message: 'Failed to find a book of this specific index'
+        })
+    })
 
 });
     //Purpsoe: Update a singular book
 books.put("/:id", (request,response) => 
 {
+    Book.findByIdAndUpdate(request.params.id)
+    .then(updatedBook => 
+    {
+        response.status(200).json(updatedBook)
+    })
+    .catch(err => 
+    {
+        response.status(400).json(
+        {
+            message: 'Failed to update the book of this specific index'
+        })
+    })
 
 });
     //Purpose: Delete a singular Book
 books.delete("/:id", (request,response) => 
 {
-
-});
-    //Purpose: add a singular Book
-books.post("/:id", (request,response) => 
-{
+    Book.findByIdAndDelete(request.params.id)
+    .then(deletedBook => 
+    {
+        response.status(200).json({message: 'Deletion Successful'})
+    })
+    .catch(err => 
+    {
+        response.status(400).json(
+        {
+            message: 'Failed to delete a book of this specific index'
+        })
+    })
 
 });
 //Catch all Route
@@ -83,5 +142,5 @@ books.get('*', (request,response) =>
 
 
 //SECTION - Export Router
-module.exports = book;
+module.exports = books;
 //!SECTION
